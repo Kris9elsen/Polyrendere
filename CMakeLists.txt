@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Set project name and C++ standard
-project(arv_eks VERSION 1.0 LANGUAGES CXX)
+project(Polyrender VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -10,7 +10,7 @@ set(SRC_DIR "src")
 set(HEADER_DIR "headers")
 
 # Collect all source and header files
-file(GLOB_RECURSE SOURCES "${SRC_DIR}/*.cpp")
+file(GLOB_RECURSE SOURCES "${SOURCES_DIR}/*.cpp")
 file(GLOB_RECURSE HEADERS "${HEADER_DIR}/*.h" "${HEADER_DIR}/*.hpp")
 
 # Add executable target
