@@ -287,6 +287,15 @@ struct Mat4 {
         Vec3 f = (target - eye).norm();
         Vec3 r = f.cross(up).norm();
         Vec3 u = r.cross(f);
+
+        Mat4 mat = identity();
+        mat.m[0][0] = r.x; mat.m[0][1] = r.y; mat.m[0][2] = r.z;
+        mat.m[1][0] = u.x; mat.m[1][1] = u.y; mat.m[1][2] = u.z;
+        mat.m[2][0] = -f.x; mat.m[2][1] = -f.y; mat.m[2][2] = -f.z;
+        mat.m[0][3] = -r.dot(eye);
+        mat.m[1][3] = -u.dot(eye);
+        mat.m[2][3] = f.dot(eye);
+        return mat;
     }
 
     // Transform Vec4
