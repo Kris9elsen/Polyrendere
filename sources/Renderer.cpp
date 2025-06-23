@@ -8,6 +8,26 @@ Renderer::Renderer(int width, int height) :
     projection = Mat4::identity();
 }
 
+// Inits display window
+void Renderer::init_x11() {
+    display = XOpenDisplay(NULL); // Creates display
+    int screen = DefaultScreen(display); // Sets default screen for display
+    window = XCreateSimpleWindow(display, RootWindow(display, screen),
+                                 0, 0, width, height, 1,
+                                 BlackPixel(display, screen),
+                                 WhitePixel(display, screen));
+
+    XSelectInput(display, window, ExposureMask | KeyPressMask);
+    XMapWindow(display, window);
+    gc = DefaultGC(display, screen);
+
+    framebuffer = new uint32_t[width * height]; // 1D array with all pixels
+
+    ximage = XCreateImage(display, DefaultVisual(display, screen), 24,
+                          ZPixmap, 0, (char*)framebuffer,
+                          width, height, 32, 0);
+}
+
 // METHODS
 
 // Project vertex from model space to screen space
@@ -79,6 +99,43 @@ void Renderer::draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
     }
 }
 
+// Set color of pixel
+void Renderer::put_pixel(int x, int y, uint32_t color) {
+    if (x < 0 || x > width || y < 0 || y > height) return;
+    framebuffer[y * width + x] = color;
+}
+
+// Clears display with one color
+void Renderer::clear(uint32_t color) {
+    for (int i = 0; i < width * height; i++) {
+        framebuffer[i] = color;
+    }
+}
+
+// Render a rotating box
+void Renderer::render_rotating_box(float angle) {
+    int cx = width / 2;
+    int cy = height / 2;
+    int size = 100;
+
+    // Get Sin and Cos of the angle
+    float s = std::sin(angle);
+    float c = std::cos(angle);
+
+    // Sets the x and y coords for the pixel of the box
+    for (int y = -size; y < size; ++y) {
+        for (int x = -size; x < size; ++x) {
+            int ry = int(c * x - s * y);
+            int rx = int(s * x + c * y);
+            put_pixel(cx + rx, cy + ry, 0xff00ffff); // Draws a pixel with color ARGB
+        }
+    }
+}
+
+void Renderer::show() {
+    XPutImage(display, window, gc, ximage, 0, 0, 0, 0, width, height);
+}
+
 // SETTERS
 
 // Set camera position and direction
@@ -91,3 +148,4 @@ void Renderer::set_projection(float fov, float nearZ, float farZ) {
     float aspect = static_cast<float>(width) / height;
     projection = Mat4::perspective(fov, aspect, nearZ, farZ);
 }
+
