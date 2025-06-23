@@ -76,6 +76,13 @@ void Renderer::render_wireframe(const Renderable& obj) {
 
 }
 
+// Render multiple wireframes
+void Renderer::render_wireframes() {
+    for (auto* obj : objects) {
+        render_wireframe(*obj);
+    }
+}
+
 // Draws a line to the framebuffer between two points 
 void Renderer::draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
     int dx = std::abs(x1 - x0);
@@ -134,6 +141,11 @@ void Renderer::render_rotating_box(float angle) {
 
 void Renderer::show() {
     XPutImage(display, window, gc, ximage, 0, 0, 0, 0, width, height);
+}
+
+// Add object to the scene
+void Renderer::add_object(Renderable* obj) {
+    objects.push_back(obj);
 }
 
 // SETTERS

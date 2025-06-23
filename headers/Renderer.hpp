@@ -28,6 +28,9 @@ public:
     // Render wireframe
     void render_wireframe(const Renderable& obj);
 
+    // Render multiple wireframes
+    void render_wireframes();
+
     // Draw line on screen
     void draw_line(int x0, int y0, int x1, int y1, uint32_t color);
 
@@ -42,6 +45,9 @@ public:
 
     // Sends framebuffer to display
     void show();
+
+    // Add object to the scene
+    void add_object(Renderable* obj);
 
 
     // SETTERS
@@ -65,6 +71,7 @@ protected:
     uint32_t* framebuffer; // Framebuffer
     Mat4 view;             // Camera matrix
     Mat4 projection;       // Projection to screen matrix
+    std::vector<Renderable*> objects; // Objects to render in scene
 };
 
 #endif

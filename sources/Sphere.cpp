@@ -28,8 +28,8 @@ void Sphere::generate_mesh(float radius, int latSegments, int longSegments) {
         }
     }
 
-    for (int lat = 0; lat <= latSegments; ++lat) {
-        for (int lon = 0; lon <= longSegments; ++lon) {
+    for (int lat = 0; lat < latSegments; ++lat) {
+        for (int lon = 0; lon < longSegments; ++lon) {
             int first = lat * (longSegments + 1) + lon;
             int second = first + longSegments + 1;
 
@@ -62,8 +62,8 @@ const Mat4 Sphere::get_model_matrix() const {
     Mat4 T = Mat4::translation(pos.x, pos.y, pos.z);
     Mat4 Rx = Mat4::rot_x(rot.x);
     Mat4 Ry = Mat4::rot_y(rot.y);
-    Mat4 Rz = Mat4::rot_y(rot.z);
-    Mat4 S = Mat4::scale(scale.x, scale.y, scale.x);
+    Mat4 Rz = Mat4::rot_z(rot.z);
+    Mat4 S = Mat4::scale(scale.x, scale.y, scale.z);
 
     return T * Rz * Ry * Rx * S;
 }

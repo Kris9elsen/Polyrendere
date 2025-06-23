@@ -1,5 +1,6 @@
 #include "Renderer.hpp"
 #include "Cube.hpp"
+#include "Sphere.hpp"
 #include "Render_math.hpp"
 
 #include <unistd.h>
@@ -15,12 +16,18 @@ int main() {
     renderer.set_projection(3.14159f / 3.0f, 0.1f, 100.0f);
 
     Cube cube;
+    cube.set_scale({1.5, 1.5, 1.5});
+    Sphere sphere(1.0f, 16, 16);
+
+    renderer.add_object(&cube);
+    renderer.add_object(&sphere);
     
     float angle = 0;
 
     while(true) {
-        cube.set_rotation(Vec3(angle, 0.5f, 0));
-        renderer.render_wireframe(cube);
+        cube.set_rotation(Vec3(-angle, -angle, 0));
+        sphere.set_rotation(Vec3(0, -angle, 0));
+        renderer.render_wireframes();
         renderer.show();
         usleep(16000);
         renderer.clear(0xff000000);
