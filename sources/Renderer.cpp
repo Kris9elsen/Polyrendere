@@ -70,8 +70,8 @@ void Renderer::render_wireframe(const Renderable& obj) {
         Vec3 v2 = projectedVerts[inds[i+2]];
 
         draw_line(int(v0.x), int(v0.y), int(v1.x), int(v1.y), 0xFFFFFFFF);
-        draw_line(int(v1.x), int(v1.y), int(v2.x), int(v2.y), 0xFFFFFFFF);
-        draw_line(int(v2.x), int(v2.y), int(v0.x), int(v0.y), 0xFFFFFFFF);
+        draw_line(int(v1.x), int(v1.y), int(v2.x), int(v2.y), 0xff00ffff);
+        draw_line(int(v2.x), int(v2.y), int(v0.x), int(v0.y), 0xffff00ff);
     }
 
 }

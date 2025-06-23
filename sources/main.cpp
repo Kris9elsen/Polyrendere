@@ -8,8 +8,6 @@ const int WIDTH = 640;
 const int HEIGHT = 480;
 
 int main() {
-    float angle = 0.0f;
-
     Renderer renderer(640, 480);
     renderer.init_x11();
 
@@ -17,16 +15,16 @@ int main() {
     renderer.set_projection(3.14159f / 3.0f, 0.1f, 100.0f);
 
     Cube cube;
-    cube.set_rotation(Vec3(0.5f, 0.5f, 0));
-
-    //renderer.render_wireframe(cube);
+    
+    float angle = 0;
 
     while(true) {
-        angle += 0.02f;
-        renderer.render_rotating_box(angle);
+        cube.set_rotation(Vec3(angle, 0.5f, 0));
+        renderer.render_wireframe(cube);
         renderer.show();
         usleep(16000);
         renderer.clear(0xff000000);
+        angle += 0.005f;
         
     }
 
