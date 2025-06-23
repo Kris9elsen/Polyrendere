@@ -1,3 +1,7 @@
+#include "Renderer.hpp"
+#include "Cube.hpp"
+#include "Render_math.hpp"
+
 #include <X11/Xlib.h>
 #include <cstring>
 #include <cmath>
@@ -69,6 +73,16 @@ int main() {
     init_x11();
 
     float angle = 0.0f;
+
+    Renderer renderer(640, 480);
+
+    renderer.set_camera(Vec3(0, 0, 5), Vec3(0, 0, 0), Vec3(0, 1, 0));
+    renderer.set_projection(3.14159f / 3.0f, 0.1f, 100.0f);
+
+    Cube cube;
+    cube.set_rotation(Vec3(0.5f, 0.5f, 0));
+
+    renderer.render_wireframe(cube);
 
     while(true) {
         angle += 0.02f;
