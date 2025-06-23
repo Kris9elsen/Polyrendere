@@ -4,25 +4,24 @@
 #pragma once
 
 #include "Render_math.hpp"
+#include "Renderable.hpp"
 
 #include <vector>
 #include <cstdint>
 
-class Cube {
+class Cube : public Renderable {
 public:
     Cube();
 
-    // METHODS
-    // Get Model matrix
-    Mat4 get_model_matrix() const;
-
-
     // GETTERS
     // Returns vertices
-    const std::vector<Vec3>& get_vertices() const;
+    const std::vector<Vec3>& get_vertices() const override;
 
     // Returns indices
-    const std::vector<uint32_t>& get_indices() const;
+    const std::vector<uint32_t>& get_indices() const override;
+
+    // Get Model matrix
+    const Mat4 get_model_matrix() const override;
 
     // SETTERS
     // Set position Vec3 {x, y, z}

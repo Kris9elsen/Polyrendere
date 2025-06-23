@@ -16,17 +16,6 @@ Cube::Cube() {
     };
 }
 
-// Returns model matrix for position, rotation and scale
-Mat4 Cube::get_model_matrix() const {
-    Mat4 T = Mat4::translation(pos.x, pos.y, pos.z);
-    Mat4 Rx = Mat4::rot_x(rot.x);
-    Mat4 Ry = Mat4::rot_y(rot.y);
-    Mat4 Rz = Mat4::rot_z(rot.z);
-    Mat4 S = Mat4::scale(scale.x, scale.y, scale.z);
-
-    return T * Rz * Ry * Rx * S;
-}
-
 // GETTERS
 
 // Returns vector<Vec3> with vertices
@@ -37,6 +26,17 @@ const std::vector<Vec3>& Cube::get_vertices() const {
 // Returns vector<uint32_t> with indices
 const std::vector<uint32_t>& Cube::get_indices() const {
     return indices;
+}
+
+// Returns model matrix for position, rotation and scale
+const Mat4 Cube::get_model_matrix() const {
+    Mat4 T = Mat4::translation(pos.x, pos.y, pos.z);
+    Mat4 Rx = Mat4::rot_x(rot.x);
+    Mat4 Ry = Mat4::rot_y(rot.y);
+    Mat4 Rz = Mat4::rot_z(rot.z);
+    Mat4 S = Mat4::scale(scale.x, scale.y, scale.z);
+
+    return T * Rz * Ry * Rx * S;
 }
 
 // SETTERS
