@@ -49,15 +49,35 @@ void Renderer::render_wireframe(const Renderable& obj) {
         Vec3 v1 = projectedVerts[inds[i+1]];
         Vec3 v2 = projectedVerts[inds[i+2]];
 
-        // ADD DRAW LINES TO FRAME BUFFER
-        // FOR NOW PRINT REMOVE LATER
-        std::cout << "Line from (" << v0.x << "," << v0.y << ") to (" << v1.x << "," << v1.y << ")\n";
-        std::cout << "Line from (" << v1.x << "," << v1.y << ") to (" << v2.x << "," << v2.y << ")\n";
-        std::cout << "Line from (" << v2.x << "," << v2.y << ") to (" << v0.x << "," << v0.y << ")\n";
+        draw_line(int(v0.x), int(v0.y), int(v1.x), int(v1.y), 0xFFFFFFFF);
+        draw_line(int(v1.x), int(v1.y), int(v2.x), int(v2.y), 0xFFFFFFFF);
+        draw_line(int(v2.x), int(v2.y), int(v0.x), int(v0.y), 0xFFFFFFFF);
     }
 
 }
 
+// Draws a line to the framebuffer between two points 
+void Renderer::draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
+    int dx = std::abs(x1 - x0);
+    int dy = -std::abs(y1 - y0);
+    int sx = x0 < x1 ? 1 : -1;
+    int sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy;
+
+    while (true) {
+        put_pixel(x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = 2 * err;
+        if (e2 >= dy) { 
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
 
 // SETTERS
 

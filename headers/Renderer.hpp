@@ -22,7 +22,7 @@ public:
     void render_wireframe(const Renderable& obj);
 
     // Draw line on screen
-    void draw_line(const Vec3& p1, const Vec3& p2, uint32_t color);
+    void draw_line(int x0, int y0, int x1, int y1, uint32_t color);
 
 
     // SETTERS
