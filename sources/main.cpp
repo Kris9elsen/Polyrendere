@@ -16,8 +16,8 @@ int main() {
     renderer.set_projection(3.14159f / 3.0f, 0.1f, 100.0f);
 
     Cube cube;
-    cube.set_scale({1.5, 1.5, 1.5});
-    Sphere sphere(1.0f, 16, 16);
+    cube.set_scale({1.0f, 1.0f, 1.0f});
+    Sphere sphere(3.0f, 16, 16);
 
     renderer.add_object(&cube);
     renderer.add_object(&sphere);

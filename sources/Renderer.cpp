@@ -2,6 +2,9 @@
 
 Renderer::Renderer(int width, int height) :
     width(width), height(height) {
+    
+    // Resize zbuffer for screen size.
+    zbuffer.resize(width * height, std::numeric_limits<float>::infinity());
 
     // Set view and projection to eye mat standard
     view = Mat4::identity();
@@ -69,9 +72,9 @@ void Renderer::render_wireframe(const Renderable& obj) {
         Vec3 v1 = projectedVerts[inds[i+1]];
         Vec3 v2 = projectedVerts[inds[i+2]];
 
-        draw_line(int(v0.x), int(v0.y), int(v1.x), int(v1.y), 0xFFFFFFFF);
-        draw_line(int(v1.x), int(v1.y), int(v2.x), int(v2.y), 0xff00ffff);
-        draw_line(int(v2.x), int(v2.y), int(v0.x), int(v0.y), 0xffff00ff);
+        draw_line(v0, v1, 0xFFFFFFFF);
+        draw_line(v1, v2, 0xff00ffff);
+        draw_line(v2, v0, 0xffff00ff);
     }
 
 }
@@ -84,39 +87,49 @@ void Renderer::render_wireframes() {
 }
 
 // Draws a line to the framebuffer between two points 
-void Renderer::draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
-    int dx = std::abs(x1 - x0);
-    int dy = -std::abs(y1 - y0);
-    int sx = x0 < x1 ? 1 : -1;
-    int sy = y0 < y1 ? 1 : -1;
-    int err = dx + dy;
+void Renderer::draw_line(Vec3 v0, Vec3 v1, uint32_t color) {
+    int x0 = int(v0.x), y0 = int(v0.y);
+    int x1 = int(v1.x), y1 = int(v1.y);
 
-    while (true) {
-        put_pixel(x0, y0, color);
-        if (x0 == x1 && y0 == y1) break;
-        int e2 = 2 * err;
-        if (e2 >= dy) { 
-            err += dy;
-            x0 += sx;
-        }
-        if (e2 <= dx) {
-            err += dx;
-            y0 += sy;
-        }
+    float z0 = v0.z;
+    float z1 = v1.z;
+
+    int dx = std::abs(x1 - x0);
+    int dy = std::abs(y1 - y0);
+    int steps = std::max(dx, dy);
+
+    for (int i = 0; i <= steps; ++i) {
+        float t = steps > 0 ? float(i) / steps : 0;
+        int x = int(x0 + (x1 - x0) * t);
+        int y = int(y0 + (y1 - y0) * t);
+        float z = z0 + (z1 - z0) * t;
+        put_pixel(x, y, z, color);
     }
 }
 
-// Set color of pixel
+// Set color of pixel with respect to depth
+void Renderer::put_pixel(int x, int y, float z, uint32_t color) {
+    if (x < 0 || x > width || y < 0 || y > height) return; // Check if pixel is on screen
+    int index = y * width + x;
+
+    if (z < zbuffer[index]) {
+        zbuffer[index] = z;
+        framebuffer[index] = color;
+    }
+}
+
+// Set color of pixel with out respect to depth
 void Renderer::put_pixel(int x, int y, uint32_t color) {
-    if (x < 0 || x > width || y < 0 || y > height) return;
+    if (x < 0 || x > width || y < 0 || y > height) return; // Check if pixel is on screen
     framebuffer[y * width + x] = color;
+    
 }
 
 // Clears display with one color
 void Renderer::clear(uint32_t color) {
-    for (int i = 0; i < width * height; i++) {
-        framebuffer[i] = color;
-    }
+    std::fill(framebuffer, framebuffer + (width * height), color);
+    std::fill(zbuffer.begin(), zbuffer.end(), std::numeric_limits<float>::infinity());
+
 }
 
 // Render a rotating box

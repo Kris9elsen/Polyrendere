@@ -32,10 +32,11 @@ public:
     void render_wireframes();
 
     // Draw line on screen
-    void draw_line(int x0, int y0, int x1, int y1, uint32_t color);
+    void draw_line(Vec3 v0, Vec3 v1, uint32_t color);
 
     // Set color of pixel
-    void put_pixel(int x, int y, uint32_t color);
+    void put_pixel(int x, int y, float z, uint32_t color); // For drendering with respect to depth
+    void put_pixel(int x, int y, uint32_t color); // Does not respect depth
 
    // Clears display with one color
     void clear(uint32_t color);
@@ -72,6 +73,7 @@ protected:
     Mat4 view;             // Camera matrix
     Mat4 projection;       // Projection to screen matrix
     std::vector<Renderable*> objects; // Objects to render in scene
+    std::vector<float> zbuffer;       // Z-Buffer for depth perspective
 };
 
 #endif
