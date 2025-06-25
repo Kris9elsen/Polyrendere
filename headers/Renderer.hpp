@@ -7,6 +7,7 @@
 #include "Renderable.hpp"
 
 #include <vector>
+#include <array>
 #include <iostream> // FOR DEBUG REMOVE LATER
 #include <X11/Xlib.h>
 #include <cstring>
@@ -19,6 +20,9 @@ public:
 
     // Inits display window
     void init_x11();
+
+    // Enable SSAA and set factor
+    void enable_ssaa(int facotr);
 
     // METHODS
 
@@ -50,6 +54,11 @@ public:
     // Add object to the scene
     void add_object(Renderable* obj);
 
+    // Clamps screen coordinates
+    inline int clamp(int value, int min, int max);
+
+    // Transform model to clip
+    Vec4 model_to_clip(const Vec3& vertex, const Mat4& model_matrix) const;
 
     // SETTERS
     
@@ -59,12 +68,27 @@ public:
     // Set projection fov nearZ and farZ
     void set_projection(float fov, float nearZ, float farZ);
 
-    
+    // CLIP PLANE
+    enum class Clip_plane {
+        Left, Right, Bottom, Top, Near, Far
+    };
 
+    // Clip plane helper methods
+    // Check if inside clip plane
+    static bool inside(const Vec4& v, Clip_plane plane);
 
+    // Interpolate clipping
+    static Vec4 interpolate(const Vec4& a, const Vec4& b, Clip_plane plane);
+
+    // Clip polygon against a single plane
+    std::vector<Vec4> clip_poly(const std::vector<Vec4>& vertices, Renderer::Clip_plane plane);
+
+    // Clip triangles
+    std::vector<std::array<Vec4, 3>> clip_triangle(const std::array<Vec4, 3>& triangle);
 
 protected:
     int width, height;     // Window size
+    int size;              // Size of framebuffer
     Display* display;      // Display
     Window window;         // Window
     GC gc;                 // gc
@@ -74,6 +98,15 @@ protected:
     Mat4 projection;       // Projection to screen matrix
     std::vector<Renderable*> objects; // Objects to render in scene
     std::vector<float> zbuffer;       // Z-Buffer for depth perspective
+
+    // SSAA
+    bool ssaa = false;     // Enable SSAA
+    int ssaa_factor;       // SSAA factor
+    int ssaa_width;        // Width of SSAA buffer
+    int ssaa_height;       // Height of SSAA buffer
+    int ssaa_size;         // Size of SSAA buffer
+    int ssaa_samples;      // Sample size of SSAA
+    uint32_t* ssaa_buffer; // SSAA framebuffer
 };
 
 #endif

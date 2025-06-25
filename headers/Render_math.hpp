@@ -4,6 +4,7 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
 
 // 2D Vector
 struct Vec2 {
@@ -123,6 +124,11 @@ struct Vec4 {
     }
 
     Vec3 homo() const {
+        if (w == 0.0f) {
+            std::cerr << "[Error] Vec4::homo() called with w == 0!\n";
+            return Vec3(0, 0, 0);
+        }
+
         return Vec3(x / w, y / w, z / w);
     }
 

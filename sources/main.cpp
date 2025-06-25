@@ -11,6 +11,7 @@ const int HEIGHT = 480;
 int main() {
     Renderer renderer(640, 480);
     renderer.init_x11();
+    renderer.enable_ssaa(1);
 
     renderer.set_camera(Vec3(0, 0, 5), Vec3(0, 0, 0), Vec3(0, 1, 0));
     renderer.set_projection(3.14159f / 3.0f, 0.1f, 100.0f);
