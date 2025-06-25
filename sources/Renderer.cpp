@@ -38,6 +38,7 @@ void Renderer::enable_ssaa(int factor) {
     // Check if we are enabeling or disabeling SSAA
     if (factor <= 1) {
         ssaa = false;
+        zbuffer.resize(size, std::numeric_limits<float>::infinity());
         return;
     }
 
@@ -67,12 +68,12 @@ Vec3 Renderer::project_vertex(const Vec3& vertex, const Mat4& model_matrix) cons
     if (clip.w == 0.0f) clip.w = 1e-5f; // Avoids division by zero
     Vec3 ndc = clip.homo();
 
-
     // Convert normalized device coords to  screen coords
-    int x_screen = static_cast<int>((ndc.x + 1.0f) * 0.5f * (ssaa ? ssaa_width : width));
-    int y_screen = static_cast<int>((1.0f - ndc.y) * 0.5f * (ssaa ? ssaa_height : height));
+    ndc.x = static_cast<int>((ndc.x + 1.0f) * 0.5f * (ssaa ? ssaa_width : width));
+    ndc.y = static_cast<int>((1.0f - ndc.y) * 0.5f * (ssaa ? ssaa_height : height));
+    ndc.z = (ndc.z + 1.0f) * 0.5f;
 
-    return Vec3(float(x_screen), float(y_screen), ndc.z);
+    return ndc;
 }
 
 // Render wireframe
@@ -163,6 +164,7 @@ void Renderer::draw_line(Vec3 v0, Vec3 v1, uint32_t color) {
 
 // Set color of pixel with respect to depth
 void Renderer::put_pixel(int x, int y, float z, uint32_t color) {
+    z = clamp(z, 0.0f, 1.0f);
     if (ssaa) {
         if (x < 0 || x >= ssaa_width || y < 0 || y >= ssaa_height) return;
         int index = y * ssaa_width + x;
