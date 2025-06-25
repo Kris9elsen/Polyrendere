@@ -354,6 +354,7 @@ std::vector<Vec4> Renderer::clip_poly(const std::vector<Vec4>& vertices, Rendere
         }
 
     }
+    
     return output;
 
 }
@@ -380,6 +381,7 @@ std::vector<std::array<Vec4, 3>> Renderer::clip_triangle(const std::array<Vec4, 
     for (size_t i = 1; i + 1 < vertices.size(); ++i) {
         output.push_back({vertices[0], vertices[i], vertices[i + 1]});
     }
+
     return output;
 
 }
