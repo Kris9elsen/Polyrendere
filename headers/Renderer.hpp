@@ -13,6 +13,7 @@
 #include <cstring>
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
 class Renderer {
 public:
@@ -24,6 +25,9 @@ public:
     // Enable SSAA and set factor
     void enable_ssaa(int facotr);
 
+    // Disable SSAA
+    void disable_ssaa();
+
     // METHODS
 
     // Project vertex from model space to screen space
@@ -34,6 +38,9 @@ public:
 
     // Render multiple wireframes
     void render_wireframes();
+
+    // Render filled object
+    void render_filled(const Renderable& obj);
 
     // Draw line on screen
     void draw_line(Vec3 v0, Vec3 v1, uint32_t color);
@@ -59,6 +66,12 @@ public:
 
     // Transform model to clip
     Vec4 model_to_clip(const Vec3& vertex, const Mat4& model_matrix) const;
+
+    // Helper to compute baryentric coordinates
+    inline bool Renderer::barycentric(const Vec3& p, const Vec3& a, const Vec3& b, const Vec3& c, float& u, float& v, float& w);
+
+    // Rasterize a single triangle
+    void Renderer::draw_triangle(const Vec3& v0, const Vec3& v1, const Vec3& v2, uint32_t color);
 
     // SETTERS
     

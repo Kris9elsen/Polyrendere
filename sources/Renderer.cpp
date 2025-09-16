@@ -51,7 +51,15 @@ void Renderer::enable_ssaa(int factor) {
     ssaa_buffer = new uint32_t[ssaa_size];
     zbuffer.resize(ssaa_size, std::numeric_limits<float>::infinity());
 
+    return;
 }
+
+// Disable SSAA
+void Renderer::disable_ssaa() {
+    enable_ssaa(0);
+    return;
+}
+
 
 // METHODS
 
@@ -139,6 +147,10 @@ void Renderer::render_wireframes() {
     for (auto* obj : objects) {
         render_wireframe(*obj);
     }
+}
+
+void Renderer::render_filled(const Renderable& obj) {
+    
 }
 
 // Draws a line to the framebuffer between two points 
@@ -263,6 +275,50 @@ void Renderer::add_object(Renderable* obj) {
 // Clamps screen coordinates
 inline int Renderer::clamp(int value, int min, int max) {
     return std::max(min, std::min(value, max));
+}
+
+// Helper to comute barycentric coordinates
+inline bool Renderer::barycentric(const Vec3& p, const Vec3& a, const Vec3& b, const Vec3& c, float& u, float& v, float& w) {
+    Vec3 v0 = b - a;
+    Vec3 v1 = c - a;
+    Vec3 v2 = p - a;
+
+    float d00 = v0.x * v0.x + v0.y * v0.y;
+    float d01 = v0.x * v1.x + v0.y * v1.y;
+    float d11 = v1.x * v1.x + v1.y * v1.y;
+    float d20 = v2.x * v0.x + v2.y * v0.y;
+    float d21 = v2.x * v1.x + v2.y * v1.y;
+
+    float denom = d00 * d11 - d01 * d01;
+    if (fabs(denom) < 1e-8f) return false; // degenerate
+
+    v = (d11 * d20 - d01 * d21) / denom;
+    w = (d00 * d21 - d01 * d20) / denom;
+    u = 1.0f - v - w;
+
+    return (u >= 0.0f && v >= 0.0f && w >= 0.0f);
+}
+
+// Rasterize a single trinagle
+void Renderer::draw_triangle(const Vec3& v0, const Vec3& v1, const Vec3& v2, uint32_t color) {
+    int minX = clamp((int)std::floor(std::min({v0.x, v1.x, v2.x})), 0, ssaa ? ssaa_width - 1 : width - 1);
+    int maxX = clamp((int)std::ceil(std::max({v0.x, v1.x, v2.x})), 0, ssaa ? ssaa_width - 1 : width -1 );
+    int minY = clamp((int)std::floor(std::min({v0.y, v1.y, v2.y})), 0, ssaa ? ssaa_height - 1 : height - 1);
+    int maxY = clamp((int)std::ceil(std::max({v0.y, v1.y, v2.y})), 0, ssaa ? ssaa_height - 1 : height - 1);
+
+    for (int y = minY; y <= maxY; ++y) {
+        for (int x = minX; x <=maxX; ++x) {
+            Vec3 p((float)x + 0.5f, (float)y + 0.5f, 0.0f);
+            float u, v, w;
+            if (barycentric(p, v0, v1, v2, u, v, w)) {
+                // Interpolate depth
+                float z = u * v0.z + v * v1.z + w * v2.z;
+
+                // Write pixel with depth test
+                put_pixel(x, y, z, color);
+            }
+        }
+    }
 }
 
 // SETTERS
